@@ -11,23 +11,78 @@ import java.util.Map;
  */
 public class Cash {
 
-    private final Map<Key<?>, Object> map = new HashMap<>();
-    private final Map values = Collections.synchronizedMap(map);
+    public static class unboundedCash {
+        private static final Map<Key<?>, Object> map = new HashMap<>();
+        private static final Map mapUncapped = Collections.synchronizedMap(map);
 
-    public <T> void storeValue(Key<T> key, T value){
-        values.put( key, value);
+        static <T> void storeValue(Key<T> key, T value){
+            mapUncapped.put( key, value);
+        }
+
+        public <T> T getValue(Key<T> key){
+            return key.type.cast( mapUncapped.get( key ) );
+        }
+
+        public <T> boolean hasKey (Key<T> key){
+            return mapUncapped.containsKey(key);
+        }
+
+        private <T> void removeValue(Key<T> key){
+            mapUncapped.remove(key);
+        }
     }
 
-    public <T> T getValue(Key<T> key){
-        return key.type.cast( values.get( key ) );
+    public static class boundedCash extends Thread {
+
+        private static int cap;
+        private static final Map<Key<?>, Object> mapCap = new HashMap<>();
+        private static final Map mapCapped = Collections.synchronizedMap(mapCap);
+
+        public int getCap() {
+            return cap;
+        }
+
+        static void setCap(int cap) {
+            boundedCash.cap = cap;
+        }
+
+        public static <T> void storeValue(Key<T> key, T value){
+            mapCapped.put( key, value);
+        }
+
+        public <T> T getValue(Key<T> key){
+            return key.type.cast( mapCapped.get( key ) );
+        }
+
+        public <T> boolean hasKey (Key<T> key){
+            return mapCapped.containsKey(key);
+        }
+
+        private <T> void removeValue(Key<T> key){
+            mapCapped.remove(key);
+        }
+
+        private int mapSize(Map map){
+            return map.size();
+        }
+
+        public void  run(){
+            while (true){
+                if(mapSize(mapCapped) > cap){
+                    System.out.println("error");
+                }
+            }
+
+        }
+
     }
 
-    public <T> boolean hasKey (Key<T> key){
-        return values.containsKey(key);
-    }
 
-    private <T> void removeValue(Key<T> key){
-        values.remove(key);
+
+
+
+    private<T> long storedValueCreation(Key<T> key){
+        return key.creation;
     }
 
 
