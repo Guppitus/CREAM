@@ -7,11 +7,11 @@ public class Key<T> {
 
     final String identifier;
     final Class<T> type;
-    final Long creation;
+    long creation;
 
     Key(String identifier, Class<T> type){
         this.identifier = identifier;
         this.type = type;
-        this.creation = System.currentTimeMillis();
+        this.creation = 0;
     }
 }

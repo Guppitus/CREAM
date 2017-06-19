@@ -11,11 +11,11 @@ import java.util.Map;
  */
 public class Cash {
 
-    public static class unboundedCash {
-        private static final Map<Key<?>, Object> map = new HashMap<>();
-        private static final Map mapUncapped = Collections.synchronizedMap(map);
+    public class UnboundedCash {
+        private final Map<Key<?>, Object> map = new HashMap<>();
+        private final Map mapUncapped = Collections.synchronizedMap(map);
 
-        static <T> void storeValue(Key<T> key, T value){
+       public <T> void storeValue(Key<T> key, T value){
             mapUncapped.put( key, value);
         }
 
@@ -32,22 +32,23 @@ public class Cash {
         }
     }
 
-    public static class boundedCash extends Thread {
+    public class BoundedCash extends Thread {
 
-        private static int cap;
-        private static final Map<Key<?>, Object> mapCap = new HashMap<>();
-        private static final Map mapCapped = Collections.synchronizedMap(mapCap);
+        private int cap = 0;
+        private final Map<Key<?>, Object> mapCap = new HashMap<>();
+        private final Map mapCapped = Collections.synchronizedMap(mapCap);
 
         public int getCap() {
             return cap;
         }
 
-        static void setCap(int cap) {
-            boundedCash.cap = cap;
+        public void setCap(int cap) {
+            this.cap = cap;
         }
 
-        public static <T> void storeValue(Key<T> key, T value){
+        public <T> void storeValue(Key<T> key, T value){
             mapCapped.put( key, value);
+            key.creation = mapSize(mapCapped);
         }
 
         public <T> T getValue(Key<T> key){
@@ -72,19 +73,6 @@ public class Cash {
                     System.out.println("error");
                 }
             }
-
         }
-
     }
-
-
-
-
-
-    private<T> long storedValueCreation(Key<T> key){
-        return key.creation;
-    }
-
-
-
 }

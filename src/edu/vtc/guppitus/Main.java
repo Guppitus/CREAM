@@ -6,25 +6,19 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Cash cash = new Cash();
+
+        Cash.BoundedCash cash = new Cash().new BoundedCash();
+        cash.setCap(5);
+
 
         String hi = "hello";
 
-        String key = "hi";
 
-        Key<String> key1 = new Key<>("key", String.class);
-       Cash.unboundedCash.storeValue(key1, hi);
+
+        Key<String> key1 = new Key<>("key1", String.class);
+        cash.storeValue(key1, hi);
 
         System.out.println(key1.creation);
-
-
-        Cash.boundedCash.setCap(1);
-
-        Cash.boundedCash.storeValue(key1, hi);
-
-
-
-
 
 
     }
