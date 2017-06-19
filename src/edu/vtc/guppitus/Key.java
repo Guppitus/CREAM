@@ -5,13 +5,19 @@ package edu.vtc.guppitus;
  */
 public class Key<T> {
 
+    static long creation;
     final String identifier;
     final Class<T> type;
-    long creation;
+
+    public static long getCreation() {
+        return creation;
+    }
+
+
 
     Key(String identifier, Class<T> type){
         this.identifier = identifier;
         this.type = type;
-        this.creation = 0;
+        this.creation = System.currentTimeMillis();
     }
 }

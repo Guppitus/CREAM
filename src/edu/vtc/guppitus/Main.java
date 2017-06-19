@@ -8,8 +8,9 @@ public class Main {
 
 
         Cash.BoundedCash cash = new Cash().new BoundedCash();
-        cash.setCap(5);
+        cash.setCap(0);
 
+         cash.start();
 
         String hi = "hello";
 
@@ -19,6 +20,7 @@ public class Main {
         cash.storeValue(key1, hi);
 
         System.out.println(key1.creation);
+
 
 
     }

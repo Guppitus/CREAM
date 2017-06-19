@@ -1,8 +1,6 @@
 package edu.vtc.guppitus;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Seth Lunn on 6/15/2017.
@@ -48,7 +46,6 @@ public class Cash {
 
         public <T> void storeValue(Key<T> key, T value){
             mapCapped.put( key, value);
-            key.creation = mapSize(mapCapped);
         }
 
         public <T> T getValue(Key<T> key){
@@ -69,8 +66,9 @@ public class Cash {
 
         public void  run(){
             while (true){
-                if(mapSize(mapCapped) > cap){
-                    System.out.println("error");
+                if (mapSize(mapCapped) > cap) {
+                    List<Key<?>> list = new ArrayList<Key<?>>(mapCapped.keySet());
+
                 }
             }
         }
