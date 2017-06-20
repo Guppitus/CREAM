@@ -15,7 +15,7 @@ public class Cash {
      */
     public class UnboundedCash {
         /** hashmap taking paramterized key object and paramterized value */
-        private final Map<Key<?>, Object> map = new HashMap<>();
+        private final Map<Key<?>, Object> map = new WeakHashMap<>();
         /** synchronized map */
         private final Map mapUncapped = Collections.synchronizedMap(map);
 
@@ -24,7 +24,7 @@ public class Cash {
          * @param key : a key object containing identifier, type, and creation time
          * @param value : the paramterized value being stored
          */
-        public <T> void storeValue(Key<T> key, T value){
+        public synchronized  <T>  void storeValue(Key<T> key, T value){
             mapUncapped.put( key, value);
         }
 
@@ -33,7 +33,7 @@ public class Cash {
          * @param key : the key object corresponding to the value being retrieved
          * @return T  : the value being retrieved.
          */
-        public <T> T getValue(Key<T> key){
+        public synchronized  <T> T getValue(Key<T> key){
             return key.type.cast( mapUncapped.get( key ) );
         }
 
@@ -42,7 +42,7 @@ public class Cash {
          * @param key the Key being searched for.
          * @return boolean : true if found, false if not
          */
-        public <T> boolean hasKey (Key<T> key){
+        public synchronized <T> boolean hasKey (Key<T> key){
             return mapUncapped.containsKey(key);
         }
 
@@ -50,7 +50,7 @@ public class Cash {
          * removes a value from UnboundedCash
          * @param key Key of entry being removed
          */
-        private <T> void removeValue(Key<T> key){
+        private synchronized <T> void removeValue(Key<T> key){
             mapUncapped.remove(key);
         }
     }
@@ -65,7 +65,7 @@ public class Cash {
         private int cap = 0;
 
         /** the hashmap containing stored paramterized keys and values */
-        private final Map<Key<?>, Object> mapCap = new HashMap<>();
+        private final Map<Key<?>, Object> mapCap = new WeakHashMap<>();
 
         /** synchronized map of hashmap storing keys and values */
         private final Map mapCapped = Collections.synchronizedMap(mapCap);
@@ -74,7 +74,7 @@ public class Cash {
          * returns the cap of BoundedCash
          * @return int : the cap of BoundedCash
          */
-        public int getCap() {
+        public synchronized int getCap() {
             return cap;
         }
 
@@ -82,7 +82,7 @@ public class Cash {
          * sets the cap of a BoundedCash
          * @param cap int : the cap of BoundedCash
          */
-        public void setCap(int cap) {
+        public synchronized void setCap(int cap) {
             this.cap = cap;
         }
 
@@ -91,7 +91,7 @@ public class Cash {
          * @param key : a key object containing identifier, type, and creation time
          * @param value : the paramterized value being stored
          */
-        public <T> void storeValue(Key<T> key, T value){
+        public synchronized <T> void storeValue(Key<T> key, T value){
             mapCapped.put( key, value);
         }
 
@@ -100,7 +100,7 @@ public class Cash {
          * @param key : the key object corresponding to the value being retrieved
          * @return T  : the value being retrieved.
          */
-        public <T> T getValue(Key<T> key){
+        public synchronized <T> T getValue(Key<T> key){
             return key.type.cast( mapCapped.get( key ) );
         }
 
@@ -109,7 +109,7 @@ public class Cash {
          * @param key the Key being searched for.
          * @return boolean : true if found, false if not
          */
-        public <T> boolean hasKey (Key<T> key){
+        public synchronized <T> boolean hasKey (Key<T> key){
             return mapCapped.containsKey(key);
         }
 
@@ -117,7 +117,7 @@ public class Cash {
          * removes a value from BoundedCash
          * @param key Key of entry being removed
          */
-        private <T> void removeValue(Key<T> key){
+        private synchronized <T> void removeValue(Key<T> key){
             mapCapped.remove(key);
         }
 
@@ -126,7 +126,7 @@ public class Cash {
          * @param map the map containing cached items.
          * @return int : the number of entries contained in map
          */
-        private int mapSize(Map map){
+        private synchronized int mapSize(Map map){
             return map.size();
         }
 
@@ -143,9 +143,14 @@ public class Cash {
 
 
                     for (Key key : list) {
-                       // System.out.println(key.identifier + key.getCreation());
+                        System.out.println(key.identifier + "  " + key.getCreation());
                     }
                     removeValue(list.get(0));
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
