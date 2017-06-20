@@ -7,7 +7,7 @@ package edu.vtc.guppitus;
 public class Key<T> {
 
     /** long holding the creation time in nanoseconds  */
-    static long creation;
+    long creation;
 
 
     /** identifier string */
@@ -20,8 +20,12 @@ public class Key<T> {
      * gets the creation time
      * @return long: the creation time in nanoseconds
      */
-    public static long getCreation() {
+    public long getCreation() {
         return creation;
+    }
+    
+    public long setCreation(long creation) {
+        this.creation = creation;
     }
 
     /**
@@ -32,6 +36,6 @@ public class Key<T> {
     Key(String identifier, Class<T> type){
         this.identifier = identifier;
         this.type = type;
-        this.creation = System.nanoTime();
+        this.creation = 0;
     }
 }
