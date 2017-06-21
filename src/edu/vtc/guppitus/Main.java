@@ -1,12 +1,17 @@
 package edu.vtc.guppitus;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * examples for how to use CREAM
  */
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException, IOException {
 
         /* Initialize a BoundedCash cache  */
         Cash.BoundedCash cash = new Cash().new BoundedCash();
@@ -77,6 +82,10 @@ public class Main {
         /* clears whole cache which automatically ends maintaining thread */
         cash.mAAdCity();
 
+        if(Desktop.isDesktopSupported())
+        {
+            Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=PBwAxmrE194"));
+        }
 
     }
 }
