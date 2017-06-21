@@ -3,15 +3,18 @@ package edu.vtc.guppitus;
 import java.util.*;
 
 /**
+ * Cache Rules Everything Around Me
  * Created by Seth Lunn on 6/15/2017.
+ *
  * https://www.youtube.com/watch?v=PBwAxmrE194
  *
- * Cash is a caching mechanism that can store paramaterized keys and values.
+ * Cash is a threadsafe caching mechanism that can store paramaterized keys and values.
  */
 public class Cash {
 
     /**
      * UnboundedCash is a cache with no cap
+     * #Boring
      */
     public class UnboundedCash {
         /** hashmap taking paramterized key object and paramterized value */
@@ -24,6 +27,7 @@ public class Cash {
          * @param key : a key object containing identifier, type, and creation time
          * @param value : the paramterized value being stored
          */
+        @SuppressWarnings("unchecked")
         public synchronized  <T>  void storeValue(Key<T> key, T value){
             mapUncapped.put( key, value);
         }
@@ -58,9 +62,11 @@ public class Cash {
     /**
      * BoundedCash is a cache with a user set cap
      * When BoundedCash exceeds its cap, values are removed based on order of creation.
+     * #Fun
      */
     public class BoundedCash extends Thread {
 
+        private volatile boolean run = true;
         /** cap is the upper boundary of the cache */
         private int cap = 0;
 
@@ -91,7 +97,10 @@ public class Cash {
          * @param key : a key object containing identifier, type, and creation time
          * @param value : the paramterized value being stored
          */
+        @SuppressWarnings("unchecked")
         public synchronized <T> void storeValue(Key<T> key, T value){
+
+            key.setCreation(System.nanoTime());
             mapCapped.put( key, value);
         }
 
@@ -106,10 +115,11 @@ public class Cash {
 
         /**
          * Checks if BoundedCash contains a specific Key
+         * Featuring Jay-Z and Future
          * @param key the Key being searched for.
          * @return boolean : true if found, false if not
          */
-        public synchronized <T> boolean hasKey (Key<T> key){
+        public synchronized <T> boolean iGotTheKeys (Key<T> key){
             return mapCapped.containsKey(key);
         }
 
@@ -131,26 +141,26 @@ public class Cash {
         }
 
         /**
+         * Empties cache which also ends thread maintaining cap
+         * "This M.A.A.d city I run, my !#$@& "
+         */
+        public synchronized void mAAdCity() {
+            mapCapped.clear();
+        }
+
+        /**
          * thread that manages the limited number of keys/values in BoundedCash
          * removing values based on creation time if # of entries exceeds user set cap.
          */
+        @SuppressWarnings("unchecked")
         public void  run(){
-            while (true){
-                if (mapSize(mapCapped) > cap) {
+            while (run){
+                if (mapSize(mapCapped)==0){
+                    run = false;
+                }else if (mapSize(mapCapped) > cap) {
                     List<Key<?>> list = new ArrayList<Key<?>>(mapCapped.keySet());
-                    Collections.sort(list, new CreationComparator());
-
-
-
-                    for (Key key : list) {
-                        System.out.println(key.identifier + "  " + key.getCreation());
-                    }
+                    list.sort(new CreationComparator());
                     removeValue(list.get(0));
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         }
