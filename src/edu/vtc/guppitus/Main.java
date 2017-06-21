@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 
 /**
  * examples for how to use CREAM
+ *
+ * @uthor Seth Lunn
  */
 
 public class Main {
@@ -72,7 +74,7 @@ public class Main {
 
         /* retrieving a meta cache */
         Cash.UnboundedCash retrievedMetaCash = cash.getValue(key3);
-        System.out.println(metaCash.getValue(uKeyExample));
+        System.out.println(retrievedMetaCash.getValue(uKeyExample));
 
         /* retrieving a key stored within the cache */
         String value = cash.getValue(cash.getValue(key4));
