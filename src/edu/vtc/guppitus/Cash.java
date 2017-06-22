@@ -1,5 +1,6 @@
 package edu.vtc.guppitus;
 
+import java.lang.ref.SoftReference;
 import java.util.*;
 
 /**
@@ -18,7 +19,7 @@ public class Cash {
      */
     public class UnboundedCash {
         /** hashmap taking paramterized key object and paramterized value */
-        private final Map<Key<?>, Object> map = new WeakHashMap<>();
+        private  final Map<Key<?,?>, SoftReference<Object>> map = new HashMap<>();
         /** synchronized map */
         private final Map mapUncapped = Collections.synchronizedMap(map);
 
@@ -28,7 +29,7 @@ public class Cash {
          * @param value : the paramterized value being stored
          */
         @SuppressWarnings("unchecked")
-        public synchronized  <T>  void storeValue(Key<T> key, T value){
+        public synchronized  <X,Y>  void storeValue(Key<X,Y> key, Y value){
             mapUncapped.put( key, value);
         }
 
@@ -37,7 +38,7 @@ public class Cash {
          * @param key : the key object corresponding to the value being retrieved
          * @return T  : the value being retrieved.
          */
-        public synchronized  <T> T getValue(Key<T> key){
+        public synchronized  <X,Y> Y getValue(Key<X,Y> key){
             return key.type.cast( mapUncapped.get( key ) );
         }
 
@@ -46,7 +47,7 @@ public class Cash {
          * @param key the Key being searched for.
          * @return boolean : true if found, false if not
          */
-        public synchronized <T> boolean hasKey (Key<T> key){
+        public synchronized <X,Y> boolean hasKey (Key<X,Y> key){
             return mapUncapped.containsKey(key);
         }
 
@@ -54,7 +55,7 @@ public class Cash {
          * removes a value from UnboundedCash
          * @param key Key of entry being removed
          */
-        private synchronized <T> void removeValue(Key<T> key){
+        private synchronized <X,Y> void removeValue(Key<X,Y> key){
             mapUncapped.remove(key);
         }
     }
@@ -64,14 +65,13 @@ public class Cash {
      * When BoundedCash exceeds its cap, values are removed based on order of creation.
      * #Fun
      */
-    public class BoundedCash extends Thread {
+    public class BoundedCash {
 
-        private volatile boolean run = true;
         /** cap is the upper boundary of the cache */
         private int cap = 0;
 
         /** the hashmap containing stored paramterized keys and values */
-        private final Map<Key<?>, Object> mapCap = new WeakHashMap<>();
+        private final Map<Key<?,?>, SoftReference<Object>> mapCap = new HashMap<>();
 
         /** synchronized map of hashmap storing keys and values */
         private final Map mapCapped = Collections.synchronizedMap(mapCap);
@@ -98,8 +98,9 @@ public class Cash {
          * @param value : the paramterized value being stored
          */
         @SuppressWarnings("unchecked")
-        public synchronized <T> void storeValue(Key<T> key, T value){
+        public synchronized <X,Y> void storeValue(Key<X,Y> key, Y value){
 
+            checkCapCondition();
             key.setCreation(System.nanoTime());
             mapCapped.put( key, value);
         }
@@ -109,7 +110,7 @@ public class Cash {
          * @param key : the key object corresponding to the value being retrieved
          * @return T  : the value being retrieved.
          */
-        public synchronized <T> T getValue(Key<T> key){
+        public synchronized <X,Y> Y getValue(Key<X,Y> key){
             return key.type.cast( mapCapped.get( key ) );
         }
 
@@ -119,7 +120,7 @@ public class Cash {
          * @param key the Key being searched for.
          * @return boolean : true if found, false if not
          */
-        public synchronized <T> boolean iGotTheKeys (Key<T> key){
+        public synchronized <X,Y> boolean iGotTheKeys (Key<X,Y> key){
             return mapCapped.containsKey(key);
         }
 
@@ -127,7 +128,7 @@ public class Cash {
          * removes a value from BoundedCash
          * @param key Key of entry being removed
          */
-        private synchronized <T> void removeValue(Key<T> key){
+        private synchronized <X,Y> void removeValue(Key<X,Y> key){
             mapCapped.remove(key);
         }
 
@@ -149,19 +150,14 @@ public class Cash {
         }
 
         /**
-         * thread that manages the limited number of keys/values in BoundedCash
          * removing values based on creation time if # of entries exceeds user set cap.
          */
         @SuppressWarnings("unchecked")
-        public void  run(){
-            while (run){
-                if (mapSize(mapCapped)==0){
-                    run = false;
-                }else if (mapSize(mapCapped) > cap) {
-                    List<Key<?>> list = new ArrayList<Key<?>>(mapCapped.keySet());
+        public void  checkCapCondition(){
+            if (mapSize(mapCapped) > cap) {
+                    List<Key<?,?>> list = new ArrayList<Key<?,?>>(mapCapped.keySet());
                     list.sort(new CreationComparator());
                     removeValue(list.get(0));
-                }
             }
         }
     }
@@ -169,10 +165,10 @@ public class Cash {
     /**
      * Compares Cached keys creation time. Used for sorting list of keys.
      */
-    public class CreationComparator implements Comparator<Key<?>> {
+    class CreationComparator implements Comparator<Key<?,?>> {
 
         @Override
-        public int compare(Key<?> key1, Key<?> key2) {
+        public int compare(Key<?,?> key1, Key<?,?> key2) {
             return compare(key1.getCreation(), key2.getCreation());
         }
 

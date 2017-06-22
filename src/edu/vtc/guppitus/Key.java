@@ -6,17 +6,17 @@ package edu.vtc.guppitus;
  *
  * https://www.youtube.com/watch?v=SFLSOIufuhM
  */
-public class Key<T> {
+public class Key<X,Y> {
 
     /** long holding the creation time in nanoseconds  */
     private long creation;
 
 
-    /** identifier string */
-    final String identifier;
+    /** identifier Object */
+    final X identifier;
 
-    /** class type of Key */
-    final Class<T> type;
+    /** class type of Value */
+    final Class<Y> type;
 
     /**
      * gets the creation time
@@ -35,7 +35,7 @@ public class Key<T> {
      * @param identifier String identification
      * @param type of class
      */
-    Key(String identifier, Class<T> type){
+    Key(X identifier, Class<Y> type){
         this.identifier = identifier;
         this.type = type;
         this.creation = 0;
