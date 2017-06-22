@@ -1,7 +1,4 @@
 # CREAM
 Cache Raps Everything Around Me
 
-CREAM is a multi-thread safe caching mechanism that can return values for keys.
-CREAM uses references, parameterized types, and synchronization.
-
-
+CREAM is a caching mechanism that can return values for keys. CREAM uses soft referenced values, parameterized types, and sychronization.
